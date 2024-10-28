@@ -6,10 +6,16 @@
     width: 500
   });
   figma.ui.onmessage = (msg) => {
-    if (msg.type === "change-opacity") {
-      for (const node of figma.currentPage.selection) {
-        if ("opacity" in node) {
-          node.opacity *= 0.5;
+    if (msg.type === "update-text") {
+      const selection = figma.currentPage.selection;
+      for (const node of selection) {
+        if (node.type === "FRAME") {
+          const textNodes = node.findAll(
+            (child) => child.type === "TEXT"
+          );
+          for (const textNode of textNodes) {
+            textNode.characters = "gleef";
+          }
         }
       }
     }

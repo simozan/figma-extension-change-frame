@@ -31,10 +31,19 @@ figma.ui.onmessage = (msg) => {
   //   figma.viewport.scrollAndZoomIntoView(nodes);
   // }
 
-  if (msg.type === "change-opacity") {
-    for (const node of figma.currentPage.selection) {
-      if ("opacity" in node) {
-        node.opacity *= 0.5
+  if (msg.type === "update-text") {
+    const selection = figma.currentPage.selection;
+    for (const node of selection) {
+      // Verifica si el nodo seleccionado es un Frame
+      if (node.type === "FRAME") {
+        // Busca todos los nodos de tipo TEXT dentro del Frame
+        const textNodes = node.findAll(
+          (child) => child.type === "TEXT"
+        ) as TextNode[];
+        for (const textNode of textNodes) {
+          // Cambia el contenido de texto a "gleef"
+          textNode.characters = "gleef";
+        }
       }
     }
   }

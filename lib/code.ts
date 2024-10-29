@@ -12,34 +12,56 @@ figma.showUI(__html__, {
   width: 500,
 });
 
+
+
+// Store original text contents
+const originalTextMap = new Map<string, string>();
+
 // Calls to "parent.postMessage" from within the HTML page will trigger this
 // callback. The callback will be passed the "pluginMessage" property of the
 // posted message.
 figma.ui.onmessage = async (msg) => {
   if (msg.type === "update-text") {
     const selection = figma.currentPage.selection;
-    
-    // Loop through the selected nodes
-    for (const node of selection) {
-      // Check if the selected node is a Frame
-      if (node.type === "FRAME") {
-        // Find all TEXT nodes within the Frame
-        const textNodes = node.findAll(
-          (child) => child.type === "TEXT"
-        ) as TextNode[];
 
-        // Load the font asynchronously before updating text
+    for (const node of selection) {
+      if (node.type === "FRAME") {
+        const textNodes = node.findAll((child) => child.type === "TEXT") as TextNode[];
+
         await figma.loadFontAsync({ family: "Inter", style: "Regular" });
 
-        // Update each text node's content
         for (const textNode of textNodes) {
+          // Store the original text in the map before updating
+          originalTextMap.set(textNode.id, textNode.characters);
+
+          // Update the text
           textNode.characters = "gleef";
         }
       }
     }
   }
 
-  // Make sure to close the plugin when you're done. Otherwise the plugin will
-  // keep running, which shows the cancel button at the bottom of the screen.
-  figma.closePlugin();
+  if (msg.type === "undo-text") {
+    const selection = figma.currentPage.selection;
+
+    for (const node of selection) {
+      if (node.type === "FRAME") {
+        const textNodes = node.findAll((child) => child.type === "TEXT") as TextNode[];
+
+        await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+
+        for (const textNode of textNodes) {
+          // Retrieve the original text from the map if available
+          const originalText = originalTextMap.get(textNode.id);
+          if (originalText !== undefined) {
+            textNode.characters = originalText;
+          }
+        }
+      }
+    }
+  }
+
+  if (msg.type === "cancel") {
+    figma.closePlugin();
+  }
 };

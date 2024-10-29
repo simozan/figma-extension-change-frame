@@ -5,7 +5,7 @@
     height: 500,
     width: 500
   });
-  figma.ui.onmessage = (msg) => {
+  figma.ui.onmessage = async (msg) => {
     if (msg.type === "update-text") {
       const selection = figma.currentPage.selection;
       for (const node of selection) {
@@ -13,6 +13,7 @@
           const textNodes = node.findAll(
             (child) => child.type === "TEXT"
           );
+          await figma.loadFontAsync({ family: "Inter", style: "Regular" });
           for (const textNode of textNodes) {
             textNode.characters = "gleef";
           }

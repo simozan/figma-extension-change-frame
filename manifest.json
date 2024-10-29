@@ -1,6 +1,6 @@
 {
-  "name": "figma-extension-change text",
-  "id": "1266889489796006566",
+  "name": "figma-extension-change text-1",
+  "id": "1263889429796006566",
   "api": "1.0.0",
   "main": "dist/code.js",
   "capabilities": [],
